@@ -1,12 +1,16 @@
 package primebot.demo.controller;
 
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import primebot.demo.DTOs.CreateEventTypeRequest;
 import primebot.demo.model.EventType;
 import primebot.demo.service.EventTypeService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/eventType")
 public class EventTypeController {
@@ -18,9 +22,10 @@ public class EventTypeController {
     }
 
     @PostMapping("/create")
-    public EventType createEventType(@RequestBody EventType eventType) {
-
-
+    public EventType createEventType(@RequestBody CreateEventTypeRequest eventType) {
+        System.out.println(" EVENT TYPE CREATE HIT");
+        log.info("Creating EventType with name: {}, description: {}, eventTypePropertyId: {}",
+                eventType.getName(), eventType.getDescription(), eventType.getEventTypePropertyId());
         return service.create(eventType);
     }
 

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -18,7 +19,6 @@ public class SlackEvent {
     private Long id;
 
     private String name;
-    private LocalDate date;
     private String type;
     private String message;
     private String createdBy;
@@ -27,6 +27,7 @@ public class SlackEvent {
     private String channelKey;
 
     private boolean notified;
+    private LocalDateTime lastTriggeredAt;
 
     @ManyToOne
     @JoinColumn(name = "event_type_id")

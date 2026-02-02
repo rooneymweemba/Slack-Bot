@@ -5,7 +5,7 @@ import primebot.demo.model.SlackEvent;
 import primebot.demo.repository.SlackEventRepository;
 import jakarta.persistence.EntityNotFoundException;
 
-import java.time.LocalDate;
+
 import java.util.List;
 
 @Service
@@ -19,9 +19,7 @@ public class SlackEventService {
 
     public SlackEvent createEvent(SlackEvent event) {
 
-        if (repository.existsByNameAndDate(
-                event.getName(),
-                event.getDate())) {
+        if (repository.existsByName(event.getName())) {
             throw new EntityNotFoundException("Event already exists");
         }
 
@@ -44,16 +42,6 @@ public class SlackEventService {
         repository.save(event);
     }
 
-    public List<SlackEvent> getEventsForDate(LocalDate date) {
-        return repository.findByDate(date);
-    }
 
-    public List<SlackEvent> getUpcomingEvents(LocalDate from, LocalDate to) {
-        return repository.findAll().stream()
-                .filter(e ->
-                        !e.getDate().isBefore(from)
-                                && !e.getDate().isAfter(to))
-                .toList();
-    }
 
 }

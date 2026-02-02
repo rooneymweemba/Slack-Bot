@@ -3,9 +3,10 @@ package primebot.demo.model;
 import jakarta.persistence.*;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 
 @Entity
@@ -22,12 +23,15 @@ public class EventTypeProperties {
     @Column(name = "end_date_time")
     private LocalDateTime endDateTime;
     @Column(name = "notify_at" , nullable = false)
-    private LocalDateTime notifyAt;
+    private LocalTime notifyAt;
     @Column(name = "schedule_type")
     private String scheduleType;
-
-    @OneToOne
-    @JoinColumn(name = "event_type_id")
-    private EventType eventType;
+    @Column(name = "recurrence_pattern")
+    private String recurrencePattern;
+    @Column(name = "day_of_week")
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek dayOfWeek;
+    @Column(name = "month_day")
+    private MonthDay monthDay;
 
 }
