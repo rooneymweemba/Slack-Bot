@@ -10,7 +10,7 @@ import java.util.List;
 public interface EventTypeRepository extends JpaRepository<EventType, Long> {
 
     @Query("""
-SELECT et FROM EventType et
+SELECT DISTINCT et FROM EventType et
 JOIN FETCH et.properties
 JOIN FETCH et.slackEvents
 """)

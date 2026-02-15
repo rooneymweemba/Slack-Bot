@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import primebot.demo.converter.MonthDayConverter;
 
 import java.time.*;
 
@@ -32,6 +33,6 @@ public class EventTypeProperties {
     @Enumerated(EnumType.STRING)
     private DayOfWeek dayOfWeek;
     @Column(name = "month_day")
-    private MonthDay monthDay;
+    private Integer monthDay;
 
 }

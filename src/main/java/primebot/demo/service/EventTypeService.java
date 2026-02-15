@@ -1,10 +1,14 @@
 package primebot.demo.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import primebot.demo.DTOs.CreateEventTypeRequest;
+import primebot.demo.exceptions.InvalidRequestException;
+import primebot.demo.exceptions.ResourceNotFoundException;
+import primebot.demo.exceptions.ServiceException;
 import primebot.demo.model.EventType;
 import primebot.demo.model.EventTypeProperties;
 import primebot.demo.repository.EventTypePropertiesRepository;
@@ -28,10 +32,10 @@ public class EventTypeService {
     @Transactional
     public EventType create(CreateEventTypeRequest request) {
         if (request.getEventTypePropertyId() == null) {
-            throw new IllegalArgumentException("eventTypePropertyId is required");
+            throw new InvalidRequestException("eventTypePropertyId is required");
         }
         EventTypeProperties props = eventTypePropertiesRepository.findById(request.getEventTypePropertyId())
-                .orElseThrow(() -> new IllegalArgumentException("EventTypeProperties not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("EventTypeProperties not found"));
         EventType eventType = new EventType();
         eventType.setName(request.getName());
         eventType.setDescription(request.getDescription());
@@ -41,34 +45,60 @@ public class EventTypeService {
                 request.getName(),
                 request.getDescription(),
                 request.getEventTypePropertyId()
-        );        return repository.save(eventType);
+        );
+        try {
+            return repository.save(eventType);
+        }catch (DataAccessException e){
+            log.error("Error saving EventType", e);
+            throw new ServiceException("Failed to create EventType");
+        }
     }
 
     @Transactional(readOnly = true)
     public Optional<EventType> findById(Long id) {
-        return repository.findById(id);
+        try {
+            return repository.findById(id);
+        } catch (DataAccessException ex) {
+            log.error("Failed to retrieve EventType with id {}", id, ex);
+            throw new ServiceException("Failed to retrieve EventType", ex);
+        }
     }
 
     @Transactional
     public Optional<EventType> update(Long id, EventType incoming) {
-        return repository.findById(id)
-                .map(existing -> {
-                    existing.setName(incoming.getName());
-                    existing.setDescription(incoming.getDescription());
-                    return repository.save(existing);
-                });
+        try {
+            return repository.findById(id)
+                    .map(existing -> {
+                        existing.setName(incoming.getName());
+                        existing.setDescription(incoming.getDescription());
+                        return repository.save(existing);
+                    });
+        } catch (DataAccessException ex) {
+            log.error("Failed to update EventType with id {}", id, ex);
+            throw new ServiceException("Failed to update EventType", ex);
+        }
     }
 
     @Transactional
     public boolean delete(Long id) {
-        if (!repository.existsById(id)) {
-            return false;
+        try {
+            if (!repository.existsById(id)) {
+                return false;
+            }
+            repository.deleteById(id);
+            return true;
+        } catch (DataAccessException ex) {
+            log.error("Failed to delete EventType with id {}", id, ex);
+            throw new ServiceException("Failed to delete EventType", ex);
         }
-        repository.deleteById(id);
-        return true;
     }
     @Transactional
     public List<EventType> findAll() {
-        return repository.findAll();
+        try {
+            return repository.findAll();
+        } catch (DataAccessException ex) {
+            log.error("Failed to retrieve all EventTypes", ex);
+            throw new ServiceException("Failed to retrieve EventTypes", ex);
+        }
     }
 }
